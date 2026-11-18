@@ -1,0 +1,11 @@
+generator,probe,caught,n_test
+z-image-turbo,seen in training,1.0,40
+z-image-turbo,never seen,0.975,40
+flux.2-klein-9b,seen in training,1.0,24
+flux.2-klein-9b,never seen,1.0,24
+illustrious,seen in training,1.0,40
+illustrious,never seen,1.0,40
+gpt-image-1.5,seen in training,1.0,30
+gpt-image-1.5,never seen,1.0,30
+midjourney-7,seen in training,1.0,25
+midjourney-7,never seen,1.0,25

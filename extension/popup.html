@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { width: 240px; margin: 0; padding: 14px; font: 13px/1.4 -apple-system, system-ui, sans-serif; color: #0f1419; background: #fff; }
+    @media (prefers-color-scheme: dark) { body { color: #e7e9ea; background: #15202b; } }
+    h1 { margin: 0 0 10px; font-size: 15px; }
+    label { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer; }
+    #server { margin-bottom: 10px; }
+    .ok { color: #00ba7c; } .bad { color: #f4212e; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 2px 0; } td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .hint { margin-top: 10px; color: #71767b; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Slop Mop</h1>
+  <label><input type="checkbox" id="enabled"> Filter my X feed</label>
+  <div id="server">Server: checking…</div>
+  <table id="stats"></table>
+  <div class="hint" id="hint"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

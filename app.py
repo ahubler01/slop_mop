@@ -19,8 +19,8 @@ import pipeline
 env.load_env()
 LOG_TARGET = logbook.start()
 
-TITLE = "Your product's name"  # TODO
-DESCRIPTION = "One sentence: who it is for and what it does."  # TODO
+TITLE = "Slop Mop"
+DESCRIPTION = "For anyone who scrolls X: scores each post (AI-generated image + bait-like text) and shows, blurs or hides it."
 
 
 def serve(raw_input: str) -> dict:
@@ -37,13 +37,23 @@ def on_run(raw_input):
         raise gr.Error("Give me an input first.")
     record = serve(raw_input)
     outputs = record["outputs"]
-    status = "⚠️ **Sent to a person for review.**" if record["review"] else "✅ Handled automatically."
+    fused = outputs["fusion"]
+    icon = {"show": "✅ **Show**", "blur": "🌫️ **Blur** (unsure: the user decides)", "hide": "🚫 **Hide**"}[fused["decision"]]
+    reasons = "; ".join(fused["reasons"]) or "nothing stands out"
+    verdict = f"{icon}: P(brainrot) = {fused['p_brainrot']:.2f}. Why: {reasons}."
     return (
-        outputs["component_a"],
-        outputs["component_b"]["reply"],
-        f"{status}  Latency {record['latency_s']} s, cost €{record['cost_eur']:.4f}.",
+        outputs["vision"],
+        verdict,
+        f"Latency {record['latency_s']} s, cost €{record['cost_eur']:.4f}.",
         record["id"],
     )
+
+
+def on_post(text, image_path):
+    """The App tab's form: text and an optional image, joined into the pipeline's one-string input."""
+    if not (text or "").strip() and not image_path:
+        raise gr.Error("Paste a post's text, upload its image, or both.")
+    return on_run(f"{text or ''}\nimage: {image_path}" if image_path else text)
 
 
 def on_feedback(request_id, value):
@@ -80,17 +90,22 @@ with gr.Blocks(title=TITLE) as demo:
 
     with gr.Tab("App"):
         request_id = gr.State("")
-        # TODO: your input. For images: gr.Image(type="filepath"); for files: gr.File(type="filepath").
-        raw_input = gr.Textbox(label="Customer message", lines=4)
-        run_button = gr.Button("Run", variant="primary")
         with gr.Row():
-            out_a = gr.JSON(label="Component A")
-            out_b = gr.Textbox(label="Component B", lines=4)
+            post_text = gr.Textbox(label="Post text", lines=4)
+            post_image = gr.Image(label="Post image (optional)", type="filepath", height=220)
+        run_button = gr.Button("Score this post", variant="primary")
+        with gr.Row():
+            out_a = gr.JSON(label="1. Vision: is the image AI-generated?")
+            out_b = gr.Markdown(label="2. Fusion: show, blur or hide")
+        # check.py and the Space API call /run with one string (see pipeline.read_input).
+        raw_input = gr.Textbox(visible=False)
+        api_button = gr.Button(visible=False)
         status = gr.Markdown()
         with gr.Row():
             up = gr.Button("👍")
             down = gr.Button("👎")
-        run_button.click(on_run, raw_input, [out_a, out_b, status, request_id], api_name="run")
+        run_button.click(on_post, [post_text, post_image], [out_a, out_b, status, request_id], api_name=False)
+        api_button.click(on_run, raw_input, [out_a, out_b, status, request_id], api_name="run")
         up.click(lambda rid: on_feedback(rid, +1), request_id, None, api_name=False)
         down.click(lambda rid: on_feedback(rid, -1), request_id, None, api_name=False)
 

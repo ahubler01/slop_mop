@@ -16,3 +16,9 @@ requirements.txt
 
 # Past logs downloaded from your Hugging Face dataset when the app starts
 logs_archive/
+
+# Raw images are re-created by data/fetch_data.py (about 1.7 GB to download)
+data/raw/images/
+# Embedding caches, re-created by train.py from data/raw/
+artifacts/cache/
+data/raw/webis-clickbait-17.zip

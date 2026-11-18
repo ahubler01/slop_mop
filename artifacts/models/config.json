@@ -1,0 +1,27 @@
+{
+  "clip_model": "openai/clip-vit-base-patch32",
+  "x_jpeg_quality": 85,
+  "fusion_features": [
+    "image_ai_score",
+    "has_image",
+    "text_bait_score",
+    "n_words",
+    "share_caps",
+    "n_punct",
+    "starts_with_number",
+    "second_person",
+    "teaser_words",
+    "n_hashtags",
+    "n_emoji"
+  ],
+  "t_low": 0.17,
+  "t_high": 0.91,
+  "C_fusion": 10,
+  "C_probe_a": 3,
+  "C_probe_b": 3,
+  "C_probe_c": 0.03,
+  "brier_probe_b": 0.006892169360071421,
+  "auc_probe_b_x_like": 0.9998262622050801,
+  "auc_wild_probe_b": 0.727446732743783,
+  "auc_wild_probe_c": 0.9428749480681348
+}

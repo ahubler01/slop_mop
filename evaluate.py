@@ -28,11 +28,19 @@ RESULTS = ROOT / "eval" / "results.csv"
 
 
 def is_correct(case: dict, result: dict) -> bool | None:
-    """TODO: is this end-to-end result correct for this case? None if code cannot tell (use the judge).
+    """`expected` is a decision (show / blur / hide) or a label (brainrot / good).
 
-    PLACEHOLDER: compares component A's label with `expected`.
+    A brainrot post is handled correctly if it is not shown as is; a good post
+    if it is not hidden (a blur costs the user a glance, not the post).
     """
-    return result["outputs"]["component_a"]["label"] == case["expected"].strip()
+    expected, got = case["expected"].strip().lower(), result["outputs"]["fusion"]["decision"]
+    if expected in {"show", "blur", "hide"}:
+        return got == expected
+    if expected == "brainrot":
+        return got != "show"
+    if expected == "good":
+        return got != "hide"
+    return None
 
 
 def main() -> None:

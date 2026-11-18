@@ -1,0 +1,206 @@
+/* Slop Mop decorations on x.com posts.
+   State is in data-slopmop-state on the <article> (X's React rewrites its class),
+   and the theme in data-slopmop-theme on <html>, read from X's page background. */
+
+:root {
+  --slopmop-text: #0f1419;
+  --slopmop-muted: #536471;
+  --slopmop-surface: #f7f9f9;
+  --slopmop-border: #cfd9de;
+  --slopmop-blur: #b45309;
+  --slopmop-blur-bg: #fef3c7;
+  --slopmop-hide: #c81e2a;
+  --slopmop-hide-bg: #fde2e4;
+  --slopmop-track: rgba(15, 20, 25, 0.12);
+}
+
+:root[data-slopmop-theme="dark"] {
+  --slopmop-text: #e7e9ea;
+  --slopmop-muted: #8b98a5;
+  --slopmop-surface: #16181c;
+  --slopmop-border: #2f3336;
+  --slopmop-blur: #ffc35a;
+  --slopmop-blur-bg: rgba(255, 173, 31, 0.16);
+  --slopmop-hide: #ff6b74;
+  --slopmop-hide-bg: rgba(244, 33, 46, 0.16);
+  --slopmop-track: rgba(231, 233, 234, 0.16);
+}
+
+/* --- What happens to the post itself --- */
+
+article[data-slopmop-state="pending"] > :not(.slopmop-bar) {
+  filter: blur(8px);
+  opacity: 0.6;
+}
+
+article[data-slopmop-state="blur"] > :not(.slopmop-bar) {
+  filter: blur(18px);
+  opacity: 0.7;
+  pointer-events: none;
+  user-select: none;
+}
+
+article[data-slopmop-state="hide"] > :not(.slopmop-bar) {
+  display: none;
+}
+
+/* --- The bar: its own row at the top of the post, never on top of it ---
+   X lays the <article> out as a horizontal flexbox, which would put the bar
+   beside the post. While we decorate a post, stack its children vertically
+   and let each one take the full width. */
+
+article[data-slopmop-state="blur"],
+article[data-slopmop-state="hide"] {
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+}
+
+article[data-slopmop-state="blur"] > *,
+article[data-slopmop-state="hide"] > * {
+  align-self: stretch !important;
+}
+
+article > .slopmop-bar {
+  flex: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 16px 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--slopmop-border);
+  border-radius: 14px;
+  background: var(--slopmop-surface);
+  color: var(--slopmop-text);
+  font: 14px/1.35 TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  cursor: default;
+}
+
+article[data-slopmop-state="hide"] > .slopmop-bar {
+  margin-bottom: 10px;
+}
+
+/* Badge: decision + probability, readable at a glance */
+.slopmop-badge {
+  --tone: var(--slopmop-blur);
+  --tone-bg: var(--slopmop-blur-bg);
+  flex: none;
+  display: grid;
+  grid-template-columns: auto;
+  justify-items: start;
+  gap: 2px;
+  min-width: 64px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+
+article[data-slopmop-state="hide"] .slopmop-badge {
+  --tone: var(--slopmop-hide);
+  --tone-bg: var(--slopmop-hide-bg);
+}
+
+.slopmop-badge-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.slopmop-p {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.slopmop-meter {
+  display: block;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--slopmop-track);
+  overflow: hidden;
+}
+
+.slopmop-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--tone);
+}
+
+/* Text: headline + reasons, wrapping instead of being cut off */
+.slopmop-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.slopmop-headline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.slopmop-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--slopmop-blur);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+article[data-slopmop-state="hide"] .slopmop-icon {
+  stroke: var(--slopmop-hide);
+}
+
+/* One short reason per line */
+.slopmop-reasons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--slopmop-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.slopmop-reasons li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.slopmop-reasons li::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--slopmop-blur);
+}
+
+article[data-slopmop-state="hide"] .slopmop-reasons li::before {
+  background: var(--slopmop-hide);
+}
+
+.slopmop-show {
+  flex: none;
+  padding: 6px 16px;
+  border: 1px solid var(--slopmop-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--slopmop-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.slopmop-show:hover {
+  background: var(--slopmop-track);
+}
